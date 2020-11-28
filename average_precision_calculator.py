@@ -111,16 +111,14 @@ class AveragePrecisionCalculator(object):
     if len(predictions) != len(actuals):
       raise ValueError("the shape of predictions and actuals does not match.")
 
-    if num_positives is not None:
+    if not num_positives is None:
       if not isinstance(num_positives, numbers.Number) or num_positives < 0:
-        raise ValueError(
-            "'num_positives' was provided but it was a negative number.")
+        raise ValueError("'num_positives' was provided but it wan't a nonzero number.")
 
-    if num_positives is not None:
+    if not num_positives is None:
       self._total_positives += num_positives
     else:
-      self._total_positives += numpy.size(
-          numpy.where(numpy.array(actuals) > 1e-5))
+      self._total_positives += numpy.size(numpy.where(actuals > 0))
     topk = self._top_n
     heap = self._heap
 

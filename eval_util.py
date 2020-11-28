@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Provides functions to help with evaluating models."""
-import average_precision_calculator as ap_calculator
-import mean_average_precision_calculator as map_calculator
+import datetime
 import numpy
-from tensorflow.python.platform import gfile
 
+#from tensorflow.python.platform import gfile
+
+import mean_average_precision_calculator as map_calculator
+import average_precision_calculator as ap_calculator
 
 def flatten(l):
   """Merges a list of lists into a single list. """
@@ -144,15 +146,12 @@ def top_k_triplets(predictions, labels, k=20):
 class EvaluationMetrics(object):
   """A class to store the evaluation metrics."""
 
-  def __init__(self, num_class, top_k, top_n):
+  def __init__(self, num_class, top_k):
     """Construct an EvaluationMetrics object to store the evaluation metrics.
 
     Args:
       num_class: A positive integer specifying the number of classes.
-      top_k: A positive integer specifying how many predictions are considered
-        per video.
-      top_n: A positive Integer specifying the average precision at n, or None
-        to use all provided data points.
+      top_k: A positive integer specifying how many predictions are considered per video.
 
     Raises:
       ValueError: An error occurred when MeanAveragePrecisionCalculator cannot
@@ -161,8 +160,7 @@ class EvaluationMetrics(object):
     self.sum_hit_at_one = 0.0
     self.sum_perr = 0.0
     self.sum_loss = 0.0
-    self.map_calculator = map_calculator.MeanAveragePrecisionCalculator(
-        num_class, top_n=top_n)
+    self.map_calculator = map_calculator.MeanAveragePrecisionCalculator(num_class)
     self.global_ap_calculator = ap_calculator.AveragePrecisionCalculator()
     self.top_k = top_k
     self.num_examples = 0

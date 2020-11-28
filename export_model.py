@@ -93,22 +93,20 @@ class ModelExporter(object):
     return inputs, outputs
 
   def build_prediction_graph(self, serialized_examples):
-    input_data_dict = (
+
+    video_id, model_input_raw, labels_batch, num_frames = (
         self.reader.prepare_serialized_examples(serialized_examples))
-    video_id = input_data_dict["video_ids"]
-    model_input_raw = input_data_dict["video_matrix"]
-    labels_batch = input_data_dict["labels"]
-    num_frames = input_data_dict["num_frames"]
 
     feature_dim = len(model_input_raw.get_shape()) - 1
     model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
 
-    with tf.variable_scope("tower"):
-      result = self.model.create_model(model_input,
-                                       num_frames=num_frames,
-                                       vocab_size=self.reader.num_classes,
-                                       labels=labels_batch,
-                                       is_training=False)
+    with tf.name_scope("model"):
+      result = self.model.create_model(
+          model_input,
+          num_frames=num_frames,
+          vocab_size=self.reader.num_classes,
+          labels=labels_batch,
+          is_training=False)
 
       for variable in slim.get_model_variables():
         tf.summary.histogram(variable.op.name, variable)
